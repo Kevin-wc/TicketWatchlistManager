@@ -1,24 +1,48 @@
 package com.example.ticketwatchlistmanager;
 
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements TickerListFragment.OnTickerSelectedListener {
+
+    private FragmentManager fm;
+    private TickerListFragment listFragment;
+    private InfoWebFragment webFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
+        fm = getSupportFragmentManager();
+
+        if (savedInstanceState == null) {
+            // create fragments
+            listFragment = new TickerListFragment();
+            webFragment  = new InfoWebFragment();
+
+            FragmentTransaction trans = fm.beginTransaction();
+            trans.add(R.id.ListFragment, listFragment, "listFragment");
+            trans.add(R.id.infoFragment, webFragment, "webFragment");
+            trans.commit();
+        } else {
+            // recover references by tag
+            listFragment = (TickerListFragment) fm.findFragmentByTag("listFragment");
+            webFragment  = (InfoWebFragment)  fm.findFragmentByTag("webFragment");
+        }
+    }
+
+
+    @Override
+    public void onTickerSelected(String ticker) {
+        if (webFragment == null) {
+            webFragment = (InfoWebFragment) fm.findFragmentByTag("webFragment");
+        }
+        if (webFragment != null) {
+            webFragment.loadTicker(ticker);
+        }
     }
 }
