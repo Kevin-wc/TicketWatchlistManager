@@ -32,7 +32,7 @@ public class SMSReceiver extends BroadcastReceiver {
 
        for (Object pdu: pdus){
            SmsMessage message;
-           if (format != null) {
+           if (pduFormat != null) {
                message = SmsMessage.createFromPdu((byte[]) pdu, pduFormat);
            } else {
                message = SmsMessage.createFromPdu((byte[]) pdu);
@@ -53,11 +53,11 @@ public class SMSReceiver extends BroadcastReceiver {
            ticker = message.substring(start, end).toUpperCase();
            status = "valid";
        } else {
-           status = "invalid format";
+           status = "invalid_format";
        }
 
        Intent launchIntent = new Intent(context, MainActivity.class);
-       launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+       launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
        launchIntent.putExtra("sms_status", status);
        launchIntent.putExtra("sms_ticker", ticker);
        context.startActivity(launchIntent);

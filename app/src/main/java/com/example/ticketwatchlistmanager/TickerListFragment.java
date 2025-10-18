@@ -107,6 +107,8 @@ public class TickerListFragment extends Fragment {
         } else {
             tickers.set(maxSize - 1, ticker);
         }
-        adapter.notifyDataSetChanged();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 }

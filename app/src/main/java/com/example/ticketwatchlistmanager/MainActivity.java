@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         fm.executePendingTransactions();
-        onNewIntent(getIntent());
+        getWindow().getDecorView().post(() -> onNewIntent(getIntent()));
     }
     @Override
     protected void onNewIntent(Intent intent){
@@ -63,24 +63,30 @@ public class MainActivity extends AppCompatActivity
         setIntent(intent);
 
         String status = intent.getStringExtra("sms_status");
-        String ticker = intent.getStringExtra("sms ticker");
+        String ticker = intent.getStringExtra("sms_ticker");
         if (status == null){
             return;
         }
 
-        if ("valid".equals(status)) {
-            if (listFragment != null && ticker != null){
+        if (status.equals("valid")) {
+            if (listFragment != null && ticker != null) {
                 listFragment.addTicker(ticker);
             }
-            if (webFragment != null && ticker != null){
+            if (webFragment != null && ticker != null) {
                 webFragment.loadTicker(ticker);
-            } else if ("invalid_format".equals(status)){
-                Toast.makeText(this,"No valid watchlist entry",Toast.LENGTH_SHORT).show();
-            } else if ("invalid_ticker".equals(status)){
-                Toast.makeText(this, "Ticker is not valid",Toast.LENGTH_SHORT).show();
             }
         }
+        if ("invalid_format".equals(status)){
+                Toast.makeText(this,"No valid watchlist entry",Toast.LENGTH_SHORT).show();
+                return;
+        }
+        if ("invalid_ticker".equals(status)){
+            Toast.makeText(this, "Ticker is not valid",Toast.LENGTH_SHORT).show();
+        return;
+        }
+        Toast.makeText(this, "Unhandled Sms" + status, Toast.LENGTH_SHORT).show();
     }
+
 
 
 
